@@ -172,7 +172,7 @@ INSERT INTO asientos (sala_id, fila, columna, numero, tipo) VALUES
 -- ============================================================
 INSERT INTO usuarios (nombre, email, contrasena, rol) VALUES
 ('Administrador', 'admin@cine.com',
- '$2b$10$YpVZmScVzBo3p7HFN/FaouMK8EL9i8W7B1iJnFz3z5WUuXNV4aFPi',
+ '$2b$10$H9ZT8VDoHR.YZlrKSvBJi.oPl3BEYdJkb6Q4ny2amwqyfXnJ2rNaK',
  'admin');
 
 -- ============================================================
