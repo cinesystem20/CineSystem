@@ -9,23 +9,26 @@ class AppError extends Error {
 }
 
 const errorHandler = (err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message    = err.isOperational ? err.message : 'Error interno del servidor';
+  // Siempre loguear el error completo para poder debuggear
+  console.error('[ERROR]', err.code, err.sqlMessage || err.message);
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.error('[ERROR]', err);
+  // Error de trigger MySQL (SIGNAL SQLSTATE '45000') — traslape de horario
+  if (err.code === 'ER_SIGNAL_EXCEPTION') {
+    return res.status(409).json({ error: err.sqlMessage || err.message });
   }
 
-  // Errores de PostgreSQL
-  if (err.code === '23505') {
-    return res.status(409).json({ error: 'Registro duplicado: ' + (err.detail || '') });
-  }
-  if (err.code === 'P0001') {
-    // Errores de triggers (RAISE EXCEPTION)
-    return res.status(409).json({ error: err.message });
+  // Entrada duplicada MySQL
+  if (err.code === 'ER_DUP_ENTRY') {
+    return res.status(409).json({ error: 'Registro duplicado.' });
   }
 
-  res.status(statusCode).json({ error: message });
+  // Error operacional conocido (AppError)
+  if (err.isOperational) {
+    return res.status(err.statusCode).json({ error: err.message });
+  }
+
+  // Error inesperado — devolver mensaje genérico pero loguear detalle
+  res.status(500).json({ error: 'Error interno del servidor' });
 };
 
 module.exports = { AppError, errorHandler };

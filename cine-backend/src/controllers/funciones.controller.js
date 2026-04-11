@@ -22,7 +22,7 @@ const create = async (req, res, next) => {
   try {
     // sala_id por defecto si solo hay una sala
     if (!req.body.sala_id) {
-      req.body.sala_id = '00000000-0000-0000-0000-000000000001';
+      req.body.sala_id = '00000000000000000000000000000001';
     }
     const f = await funcionesRepo.create(req.body);
     res.status(201).json({ data: f, message: 'Función creada exitosamente' });
