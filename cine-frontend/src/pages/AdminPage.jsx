@@ -22,7 +22,7 @@ const StatCard = ({ label, value, sub, icon }) => (
 
 const GENEROS    = ['Acción', 'Drama', 'Comedia', 'Ciencia Ficción', 'Terror', 'Animación', 'Historia'];
 const CLASIFS    = ['G', 'PG', 'PG-13', 'R', '+13', '+18'];
-const SALA_ID    = '00000000-0000-0000-0000-000000000001';
+const SALA_ID    = '00000000000000000000000000000001';
 
 // ── Formulario de película ────────────────────────────────────
 const PeliculaForm = ({ inicial, onGuardar, onCancelar }) => {
