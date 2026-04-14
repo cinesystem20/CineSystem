@@ -63,6 +63,36 @@ const marcarUsado = async (codigo) => {
   return rows[0] || null;
 };
 
+const findByUsuario = async (usuario_id) => {
+  const { rows: tiquetes } = await db.query(
+    `SELECT t.id, t.codigo, t.qr_url, t.total, t.estado, t.fecha_compra, t.fecha_uso,
+            f.fecha, f.hora, f.precio AS precio_funcion,
+            p.titulo AS pelicula_titulo, p.imagen_url AS pelicula_imagen,
+            s.nombre AS sala_nombre
+     FROM tiquetes t
+     JOIN funciones f ON f.id = t.funcion_id
+     JOIN peliculas p ON p.id = f.pelicula_id
+     JOIN salas    s ON s.id  = f.sala_id
+     WHERE t.usuario_id = ?
+     ORDER BY t.fecha_compra DESC`,
+    [usuario_id]
+  );
+
+  // Para cada tiquete, traer sus asientos
+  for (const tiquete of tiquetes) {
+    const { rows: asientos } = await db.query(
+      `SELECT a.fila, a.columna, a.numero
+       FROM detalle_tiquete dt
+       JOIN asientos a ON a.id = dt.asiento_id
+       WHERE dt.tiquete_id = ?`,
+      [tiquete.id]
+    );
+    tiquete.asientos = asientos;
+  }
+
+  return tiquetes;
+};
+
 const findAll = async ({ limit = 50, offset = 0 } = {}) => {
   const { rows } = await db.query(
     `SELECT t.*, p.titulo AS pelicula_titulo, f.fecha, f.hora
@@ -76,4 +106,4 @@ const findAll = async ({ limit = 50, offset = 0 } = {}) => {
   return rows;
 };
 
-module.exports = { findByCodigo, create, createDetalle, marcarUsado, findAll };
+module.exports = { findByCodigo, create, createDetalle, marcarUsado, findAll, findByUsuario };
