@@ -1,6 +1,6 @@
 // src/pages/AdminPage.jsx
 import { useState, useEffect } from 'react';
-import { adminService, peliculasService, funcionesService, usuariosService } from '../services/api';
+import { adminService, peliculasService, funcionesService } from '../services/api';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
@@ -22,7 +22,7 @@ const StatCard = ({ label, value, sub, icon }) => (
 
 const GENEROS    = ['Acción', 'Drama', 'Comedia', 'Ciencia Ficción', 'Terror', 'Animación', 'Historia'];
 const CLASIFS    = ['G', 'PG', 'PG-13', 'R', '+13', '+18'];
-const SALA_ID    = '00000000000000000000000000000001';
+const SALA_ID    = '00000000-0000-0000-0000-000000000001';
 
 // ── Formulario de película ────────────────────────────────────
 const PeliculaForm = ({ inicial, onGuardar, onCancelar }) => {
@@ -165,26 +165,17 @@ const FuncionForm = ({ peliculas, onGuardar, onCancelar }) => {
 };
 
 // ── Página principal ──────────────────────────────────────────
-const TABS = ['Dashboard', 'Películas', 'Funciones', 'Tiquetes', 'Usuarios'];
+const TABS = ['Dashboard', 'Películas', 'Funciones'];
 
 export default function AdminPage() {
   const [tab,       setTab]       = useState('Dashboard');
   const [dashboard, setDashboard] = useState(null);
   const [peliculas, setPeliculas] = useState([]);
   const [funciones, setFunciones] = useState([]);
-  const [usuarios,  setUsuarios]  = useState([]);
-  const [tiquetes,  setTiquetes]  = useState([]);
-  const [filtroBusq, setFiltroBusq] = useState('');
   const [loading,   setLoading]   = useState(true);
   const [showPelForm, setShowPelForm] = useState(false);
   const [showFunForm, setShowFunForm] = useState(false);
-  const [showUsrForm, setShowUsrForm] = useState(false);
   const [editando,    setEditando]    = useState(null);
-
-  // Estado formulario nuevo usuario
-  const [usrForm, setUsrForm] = useState({ nombre: '', email: '', contrasena: '', rol: 'cliente' });
-  const [usrError, setUsrError] = useState('');
-  const [usrLoading, setUsrLoading] = useState(false);
 
   const cargar = () => {
     setLoading(true);
@@ -192,14 +183,10 @@ export default function AdminPage() {
       adminService.getDashboard(),
       peliculasService.getAll(),
       funcionesService.getAll(),
-      usuariosService.getAll(),
-      adminService.getTiquetes(),
-    ]).then(([rd, rp, rf, ru, rt]) => {
+    ]).then(([rd, rp, rf]) => {
       setDashboard(rd.data.data);
       setPeliculas(rp.data.data);
       setFunciones(rf.data.data);
-      setUsuarios(ru.data.data);
-      setTiquetes(rt.data.data);
     }).finally(() => setLoading(false));
   };
 
@@ -224,29 +211,6 @@ export default function AdminPage() {
   const guardarFuncion = async (data) => {
     await funcionesService.create(data);
     setShowFunForm(false);
-    cargar();
-  };
-
-  const crearUsuario = async () => {
-    setUsrLoading(true); setUsrError('');
-    try {
-      await usuariosService.create(usrForm);
-      setShowUsrForm(false);
-      setUsrForm({ nombre: '', email: '', contrasena: '', rol: 'cliente' });
-      cargar();
-    } catch (err) { setUsrError(err.message); }
-    finally { setUsrLoading(false); }
-  };
-
-  const toggleActivo = async (id) => {
-    await usuariosService.toggleActivo(id);
-    cargar();
-  };
-
-  const cambiarRol = async (id, rolActual) => {
-    const nuevoRol = rolActual === 'admin' ? 'cliente' : 'admin';
-    if (!confirm(`¿Cambiar rol a "${nuevoRol}"?`)) return;
-    await usuariosService.cambiarRol(id, nuevoRol);
     cargar();
   };
 
@@ -300,7 +264,7 @@ export default function AdminPage() {
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={d.ventas_por_dia} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2a2a38" />
-                  <XAxis dataKey="fecha" tick={{ fill: '#6b7280', fontSize: 12 }} tickFormatter={v => String(v || '').slice(0,10).slice(5)} />
+                  <XAxis dataKey="fecha" tick={{ fill: '#6b7280', fontSize: 12 }} tickFormatter={v => v?.slice(5)} />
                   <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{ background: '#1a1a24', border: '1px solid #2a2a38', borderRadius: 8 }}
@@ -324,7 +288,7 @@ export default function AdminPage() {
                   <div key={f.id} className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <p className="text-cinema-light text-sm font-medium truncate">{f.pelicula}</p>
-                      <p className="text-cinema-muted text-xs">{new Date(String(f.fecha).slice(0,10)+'T00:00:00').toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'})} · {f.hora?.slice(0,5)}</p>
+                      <p className="text-cinema-muted text-xs">{f.fecha} · {f.hora?.slice(0,5)}</p>
                     </div>
                     <div className="flex items-center gap-2 w-48">
                       <div className="flex-1 bg-cinema-dark rounded-full h-2">
@@ -442,7 +406,7 @@ export default function AdminPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-cinema-light font-semibold truncate">{f.pelicula_titulo}</p>
                   <p className="text-cinema-muted text-xs">
-                    {new Date(String(f.fecha).slice(0,10) + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
+                    {new Date(f.fecha + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
                     {' · '}{f.hora?.slice(0, 5)}
                     {' · '}{f.sala_nombre}
                   </p>
@@ -458,221 +422,6 @@ export default function AdminPage() {
                 <span className="text-cinema-muted text-xs">
                   {f.asientos_disponibles} disponibles
                 </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {/* ── TAB: TIQUETES ── */}
-      {tab === 'Tiquetes' && (
-        <div className="animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-display text-2xl font-bold text-cinema-light">Tiquetes</h2>
-            <span className="text-cinema-muted text-sm">{tiquetes.length} registros</span>
-          </div>
-
-          {/* Buscador */}
-          <div className="mb-4">
-            <input
-              className="input w-full sm:w-80"
-              placeholder="Buscar por código, película o usuario..."
-              value={filtroBusq}
-              onChange={e => setFiltroBusq(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            {tiquetes
-              .filter(t => {
-                if (!filtroBusq) return true;
-                const q = filtroBusq.toLowerCase();
-                return (
-                  t.codigo?.toLowerCase().includes(q) ||
-                  t.pelicula_titulo?.toLowerCase().includes(q) ||
-                  t.usuario_nombre?.toLowerCase().includes(q) ||
-                  t.usuario_email?.toLowerCase().includes(q)
-                );
-              })
-              .map(t => (
-              <div key={t.id} className="card p-4 flex items-center gap-4">
-                {/* Info principal */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-cinema-light font-semibold truncate">{t.pelicula_titulo}</p>
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded border flex-shrink-0 ${
-                      t.estado === 'activo'    ? 'bg-green-900/30 text-green-400 border-green-800' :
-                      t.estado === 'usado'     ? 'bg-yellow-900/30 text-yellow-400 border-yellow-800' :
-                      'bg-red-900/30 text-red-400 border-red-800'
-                    }`}>{t.estado}</span>
-                  </div>
-                  <p className="text-cinema-muted text-xs mt-0.5">
-                    {t.codigo} · {String(t.fecha).slice(0,10)} {t.hora?.slice(0,5)} · {t.sala_nombre}
-                  </p>
-                  <p className="text-cinema-muted text-xs">
-                    {t.usuario_nombre
-                      ? <>{t.usuario_nombre} <span className="opacity-60">({t.usuario_email})</span></>
-                      : <span className="italic">Sin cuenta</span>
-                    }
-                    {t.asientos && <> · Asientos: <span className="font-mono text-cinema-light">{t.asientos}</span></>}
-                  </p>
-                </div>
-                {/* Total */}
-                <span className="text-cinema-amber font-bold font-mono text-sm flex-shrink-0">
-                  ${parseFloat(t.total).toLocaleString('es-CO')}
-                </span>
-              </div>
-            ))}
-            {tiquetes.filter(t => {
-              if (!filtroBusq) return true;
-              const q = filtroBusq.toLowerCase();
-              return (
-                t.codigo?.toLowerCase().includes(q) ||
-                t.pelicula_titulo?.toLowerCase().includes(q) ||
-                t.usuario_nombre?.toLowerCase().includes(q) ||
-                t.usuario_email?.toLowerCase().includes(q)
-              );
-            }).length === 0 && (
-              <p className="text-cinema-muted text-sm py-4 text-center">No se encontraron tiquetes.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {tab === 'Usuarios' && (
-        <div className="animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-display text-2xl font-bold text-cinema-light">Usuarios</h2>
-            <button onClick={() => { setShowUsrForm(true); setUsrError(''); }} className="btn-primary text-sm">
-              + Nueva cuenta
-            </button>
-          </div>
-
-          {/* Formulario nueva cuenta */}
-          {showUsrForm && (
-            <div className="card p-6 space-y-4 mb-6 animate-slide-up">
-              <h3 className="font-display text-lg font-bold text-cinema-light">Nueva cuenta de usuario</h3>
-              {usrError && (
-                <div className="bg-red-900/20 border border-red-700 rounded p-3 text-red-300 text-sm">{usrError}</div>
-              )}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-cinema-muted text-xs mb-1">Nombre *</label>
-                  <input
-                    className="input"
-                    value={usrForm.nombre}
-                    onChange={e => setUsrForm(p => ({ ...p, nombre: e.target.value }))}
-                    placeholder="Nombre completo"
-                  />
-                </div>
-                <div>
-                  <label className="block text-cinema-muted text-xs mb-1">Email *</label>
-                  <input
-                    className="input"
-                    type="email"
-                    value={usrForm.email}
-                    onChange={e => setUsrForm(p => ({ ...p, email: e.target.value }))}
-                    placeholder="correo@ejemplo.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-cinema-muted text-xs mb-1">Contraseña *</label>
-                  <input
-                    className="input"
-                    type="password"
-                    value={usrForm.contrasena}
-                    onChange={e => setUsrForm(p => ({ ...p, contrasena: e.target.value }))}
-                    placeholder="Mínimo 6 caracteres"
-                  />
-                </div>
-                <div>
-                  <label className="block text-cinema-muted text-xs mb-1">Rol *</label>
-                  <select
-                    className="input"
-                    value={usrForm.rol}
-                    onChange={e => setUsrForm(p => ({ ...p, rol: e.target.value }))}
-                  >
-                    <option value="cliente">Cliente</option>
-                    <option value="admin">Admin</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={crearUsuario}
-                  disabled={usrLoading || !usrForm.nombre || !usrForm.email || !usrForm.contrasena}
-                  className="btn-primary text-sm disabled:opacity-50"
-                >
-                  {usrLoading ? 'Creando…' : 'Crear cuenta'}
-                </button>
-                <button
-                  onClick={() => { setShowUsrForm(false); setUsrError(''); }}
-                  className="text-cinema-muted hover:text-cinema-light text-sm transition-colors"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Tabla de usuarios */}
-          <div className="space-y-3">
-            {usuarios.length === 0 && (
-              <p className="text-cinema-muted text-sm">No hay usuarios registrados.</p>
-            )}
-            {usuarios.map(u => (
-              <div key={u.id} className="card p-4 flex items-center gap-4">
-                {/* Avatar inicial */}
-                <div className="w-9 h-9 rounded-full bg-cinema-amber/20 flex items-center justify-center flex-shrink-0">
-                  <span className="text-cinema-amber font-bold text-sm">
-                    {u.nombre.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p className="text-cinema-light font-semibold truncate">{u.nombre}</p>
-                  <p className="text-cinema-muted text-xs truncate">{u.email}</p>
-                </div>
-
-                {/* Rol */}
-                <span className={`text-xs font-mono px-2 py-0.5 rounded flex-shrink-0 ${
-                  u.rol === 'admin'
-                    ? 'bg-cinema-amber/20 text-cinema-amber'
-                    : 'bg-cinema-border text-cinema-muted'
-                }`}>
-                  {u.rol}
-                </span>
-
-                {/* Estado activo */}
-                <span className={`text-xs font-mono px-2 py-0.5 rounded flex-shrink-0 ${
-                  u.activo
-                    ? 'bg-green-900/30 text-green-400'
-                    : 'bg-red-900/20 text-red-400'
-                }`}>
-                  {u.activo ? 'activo' : 'inactivo'}
-                </span>
-
-                {/* Acciones */}
-                <div className="flex gap-3 flex-shrink-0">
-                  <button
-                    onClick={() => cambiarRol(u.id, u.rol)}
-                    className="text-cinema-muted hover:text-cinema-amber text-xs transition-colors"
-                    title="Cambiar rol"
-                  >
-                    {u.rol === 'admin' ? '→ cliente' : '→ admin'}
-                  </button>
-                  <button
-                    onClick={() => toggleActivo(u.id)}
-                    className={`text-xs transition-colors ${
-                      u.activo
-                        ? 'text-cinema-muted hover:text-red-400'
-                        : 'text-cinema-muted hover:text-green-400'
-                    }`}
-                    title={u.activo ? 'Desactivar cuenta' : 'Activar cuenta'}
-                  >
-                    {u.activo ? 'Desactivar' : 'Activar'}
-                  </button>
-                </div>
               </div>
             ))}
           </div>
