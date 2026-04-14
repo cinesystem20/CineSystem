@@ -11,6 +11,7 @@ const asientosRoutes  = require('./routes/asientos.routes');
 const tiquetesRoutes  = require('./routes/tiquetes.routes');
 const authRoutes      = require('./routes/auth.routes');
 const adminRoutes     = require('./routes/admin.routes');
+const usuariosRoutes  = require('./routes/usuarios.routes');
 const { errorHandler } = require('./middlewares/errorHandler');
 
 const app  = express();
@@ -31,6 +32,7 @@ app.use('/api/funciones', funcionesRoutes);
 app.use('/api/asientos',  asientosRoutes);
 app.use('/api/tiquetes',  tiquetesRoutes);
 app.use('/api/admin',     adminRoutes);
+app.use('/api/usuarios',  usuariosRoutes);
 
 // ── Health check ─────────────────────────────────────────────
 app.get('/health', (req, res) => res.json({ status: 'ok', env: process.env.NODE_ENV }));
