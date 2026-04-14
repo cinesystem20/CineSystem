@@ -44,6 +44,7 @@ export const tiquetesService = {
 
 export const adminService = {
   getDashboard: () => api.get('/admin/dashboard'),
+  getTiquetes:  () => api.get('/admin/tiquetes'),
 };
 
 export const usuariosService = {
