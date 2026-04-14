@@ -75,4 +75,30 @@ const getDashboard = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getDashboard };
+
+const getTiquetes = async (req, res, next) => {
+  try {
+    const { rows } = await db.query(`
+      SELECT t.id, t.codigo, t.total, t.estado, t.fecha_compra, t.qr_url,
+             f.fecha, f.hora,
+             p.titulo AS pelicula_titulo,
+             s.nombre AS sala_nombre,
+             u.nombre AS usuario_nombre, u.email AS usuario_email,
+             (SELECT GROUP_CONCAT(CONCAT(a.fila, a.columna) ORDER BY a.fila, a.columna SEPARATOR ', ')
+              FROM detalle_tiquete dt
+              JOIN asientos a ON a.id = dt.asiento_id
+              WHERE dt.tiquete_id = t.id) AS asientos
+      FROM tiquetes t
+      JOIN funciones f ON f.id = t.funcion_id
+      JOIN peliculas p ON p.id = f.pelicula_id
+      JOIN salas s ON s.id = f.sala_id
+      LEFT JOIN usuarios u ON u.id = t.usuario_id
+      ORDER BY t.fecha_compra DESC
+      LIMIT 200
+    `);
+    res.json({ data: rows });
+  } catch (err) { next(err); }
+};
+
+module.exports = { getDashboard, getTiquetes };
+
