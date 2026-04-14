@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { peliculasService, funcionesService } from '../services/api';
 
-const formatFecha = (fecha) =>
-  new Date(fecha + 'T00:00:00').toLocaleDateString('es-CO', {
+const formatFecha = (fecha) => {
+  const soloFecha = String(fecha).slice(0, 10);
+  return new Date(soloFecha + 'T00:00:00').toLocaleDateString('es-CO', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
+};
 
 const formatHora = (hora) => hora?.slice(0, 5);
 
