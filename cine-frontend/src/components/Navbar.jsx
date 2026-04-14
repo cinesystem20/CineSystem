@@ -34,7 +34,17 @@ export default function Navbar() {
           )}
           {user ? (
             <div className="flex items-center gap-3">
-              <span className="text-cinema-muted">{user.nombre}</span>
+              <Link
+                to="/perfil"
+                className="flex items-center gap-2 text-cinema-muted hover:text-cinema-amber transition-colors"
+              >
+                <div className="w-7 h-7 rounded-full bg-cinema-amber/20 flex items-center justify-center">
+                  <span className="text-cinema-amber font-bold text-xs">
+                    {user.nombre.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <span className="text-sm">{user.nombre.split(' ')[0]}</span>
+              </Link>
               <button onClick={handleLogout} className="btn-ghost text-sm py-1.5 px-4">
                 Salir
               </button>
