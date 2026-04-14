@@ -60,7 +60,7 @@ export default function TiquetePage() {
           <div>
             <p className="text-cinema-muted text-xs uppercase tracking-wide mb-0.5">Fecha</p>
             <p className="text-cinema-light font-medium">
-              {new Date(tiquete.fecha + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' })}
+              {new Date(String(tiquete.fecha).slice(0,10) + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'short' })}
             </p>
           </div>
           <div>
