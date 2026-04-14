@@ -44,10 +44,3 @@ export const tiquetesService = {
 export const adminService = {
   getDashboard: () => api.get('/admin/dashboard'),
 };
-
-export const usuariosService = {
-  getAll:       ()           => api.get('/usuarios'),
-  create:       (data)       => api.post('/usuarios', data),
-  toggleActivo: (id)         => api.patch(`/usuarios/${id}/activo`),
-  cambiarRol:   (id, rol)    => api.patch(`/usuarios/${id}/rol`, { rol }),
-};
