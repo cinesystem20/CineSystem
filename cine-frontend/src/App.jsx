@@ -9,7 +9,6 @@ import TiquetePage   from './pages/TiquetePage';
 import ValidarPage   from './pages/ValidarPage';
 import AdminPage     from './pages/AdminPage';
 import LoginPage     from './pages/LoginPage';
-import PerfilPage    from './pages/PerfilPage';
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -29,7 +28,6 @@ const AppRoutes = () => (
       <Route path="/validar"             element={<ValidarPage />} />
       <Route path="/login"               element={<LoginPage />} />
       <Route path="/admin"               element={<AdminRoute><AdminPage /></AdminRoute>} />
-      <Route path="/perfil"              element={<PerfilPage />} />
       <Route path="*"                    element={<Navigate to="/" />} />
     </Routes>
   </div>
