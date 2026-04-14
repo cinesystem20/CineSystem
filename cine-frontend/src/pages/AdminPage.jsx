@@ -193,14 +193,16 @@ export default function AdminPage() {
       peliculasService.getAll(),
       funcionesService.getAll(),
       usuariosService.getAll(),
-      adminService.getTiquetes(),
-    ]).then(([rd, rp, rf, ru, rt]) => {
+    ]).then(([rd, rp, rf, ru]) => {
       setDashboard(rd.data.data);
       setPeliculas(rp.data.data);
       setFunciones(rf.data.data);
       setUsuarios(ru.data.data);
-      setTiquetes(rt.data.data);
     }).finally(() => setLoading(false));
+    // Tiquetes se carga aparte para no bloquear el panel si falla
+    adminService.getTiquetes()
+      .then(rt => setTiquetes(rt.data.data))
+      .catch(() => setTiquetes([]));
   };
 
   useEffect(() => { cargar(); }, []);
