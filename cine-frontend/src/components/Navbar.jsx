@@ -32,6 +32,11 @@ export default function Navbar() {
               Panel Admin
             </Link>
           )}
+          {user && !isAdmin && (
+            <Link to="/mis-tiquetes" className="text-cinema-muted hover:text-cinema-amber transition-colors">
+              🎟️ Mis Tiquetes
+            </Link>
+          )}
           {user ? (
             <div className="flex items-center gap-3">
               <span className="text-cinema-muted">{user.nombre}</span>
