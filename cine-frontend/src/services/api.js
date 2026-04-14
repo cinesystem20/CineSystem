@@ -36,13 +36,15 @@ export const funcionesService = {
 };
 
 export const tiquetesService = {
-  comprar:  (data)   => api.post('/tiquetes', data),
-  validar:  (codigo) => api.post('/tiquetes/validar', { codigo }),
-  getOne:   (codigo) => api.get(`/tiquetes/${codigo}`),
+  comprar:       (data)   => api.post('/tiquetes', data),
+  validar:       (codigo) => api.post('/tiquetes/validar', { codigo }),
+  getOne:        (codigo) => api.get(`/tiquetes/${codigo}`),
+  getMisTiquetes: ()      => api.get('/tiquetes/mis-tiquetes'),
 };
 
 export const adminService = {
   getDashboard: () => api.get('/admin/dashboard'),
+  getTiquetes:  () => api.get('/admin/tiquetes'),
 };
 
 export const usuariosService = {
