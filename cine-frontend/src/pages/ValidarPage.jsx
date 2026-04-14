@@ -31,6 +31,8 @@ export default function ValidarPage() {
 
   const limpiar = () => { setCodigo(''); setResultado(null); };
 
+  const usarCodigo = (c) => { setCodigo(c); setResultado(null); };
+
   const cfg = resultado ? (RESULTADO_CONFIG[resultado.estado] || RESULTADO_CONFIG.invalido) : null;
 
   return (
@@ -61,6 +63,31 @@ export default function ValidarPage() {
           ) : 'Verificar Tiquete'}
         </button>
       </form>
+
+      {/* Códigos de prueba */}
+      {!resultado && (
+        <div className="card p-5">
+          <p className="text-cinema-amber text-xs font-semibold mb-3">Códigos de prueba (modo demo):</p>
+          <div className="space-y-2">
+            {[
+              { codigo: 'CIN-AB3X-KP7Q-M2WR', estado: 'valido',   label: 'Válido',   color: 'text-green-400',  icon: '✅' },
+              { codigo: 'CIN-USED-TICK-ET01', estado: 'usado',    label: 'Usado',    color: 'text-yellow-400', icon: '⚠️' },
+              { codigo: 'CIN-FAKE-CODE-0000', estado: 'invalido', label: 'Inválido', color: 'text-red-400',    icon: '✕' },
+            ].map(({ codigo: c, label, color, icon }) => (
+              <button
+                key={c}
+                onClick={() => usarCodigo(c)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-cinema-dark transition-colors group"
+              >
+                <span className="font-mono text-sm text-cinema-muted group-hover:text-cinema-light transition-colors">{c}</span>
+                <span className={`text-xs font-semibold flex items-center gap-1 ${color}`}>
+                  {icon} {label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Resultado */}
       {resultado && cfg && (
