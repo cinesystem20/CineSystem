@@ -22,7 +22,7 @@ const StatCard = ({ label, value, sub, icon }) => (
 
 const GENEROS    = ['Acción', 'Drama', 'Comedia', 'Ciencia Ficción', 'Terror', 'Animación', 'Historia'];
 const CLASIFS    = ['G', 'PG', 'PG-13', 'R', '+13', '+18'];
-const SALA_ID    = '00000000000000000000000000000001';
+const SALA_ID    = '00000000-0000-0000-0000-000000000001';
 
 // ── Formulario de película ────────────────────────────────────
 const PeliculaForm = ({ inicial, onGuardar, onCancelar }) => {
@@ -165,7 +165,7 @@ const FuncionForm = ({ peliculas, onGuardar, onCancelar }) => {
 };
 
 // ── Página principal ──────────────────────────────────────────
-const TABS = ['Dashboard', 'Películas', 'Funciones', 'Tiquetes', 'Usuarios'];
+const TABS = ['Dashboard', 'Películas', 'Funciones', 'Usuarios'];
 
 export default function AdminPage() {
   const [tab,       setTab]       = useState('Dashboard');
@@ -173,8 +173,6 @@ export default function AdminPage() {
   const [peliculas, setPeliculas] = useState([]);
   const [funciones, setFunciones] = useState([]);
   const [usuarios,  setUsuarios]  = useState([]);
-  const [tiquetes,  setTiquetes]  = useState([]);
-  const [filtroBusq, setFiltroBusq] = useState('');
   const [loading,   setLoading]   = useState(true);
   const [showPelForm, setShowPelForm] = useState(false);
   const [showFunForm, setShowFunForm] = useState(false);
@@ -193,13 +191,11 @@ export default function AdminPage() {
       peliculasService.getAll(),
       funcionesService.getAll(),
       usuariosService.getAll(),
-      adminService.getTiquetes(),
-    ]).then(([rd, rp, rf, ru, rt]) => {
+    ]).then(([rd, rp, rf, ru]) => {
       setDashboard(rd.data.data);
       setPeliculas(rp.data.data);
       setFunciones(rf.data.data);
       setUsuarios(ru.data.data);
-      setTiquetes(rt.data.data);
     }).finally(() => setLoading(false));
   };
 
@@ -300,7 +296,7 @@ export default function AdminPage() {
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={d.ventas_por_dia} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2a2a38" />
-                  <XAxis dataKey="fecha" tick={{ fill: '#6b7280', fontSize: 12 }} tickFormatter={v => String(v || '').slice(0,10).slice(5)} />
+                  <XAxis dataKey="fecha" tick={{ fill: '#6b7280', fontSize: 12 }} tickFormatter={v => v?.slice(5)} />
                   <YAxis tick={{ fill: '#6b7280', fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{ background: '#1a1a24', border: '1px solid #2a2a38', borderRadius: 8 }}
@@ -324,7 +320,7 @@ export default function AdminPage() {
                   <div key={f.id} className="flex items-center gap-4">
                     <div className="flex-1 min-w-0">
                       <p className="text-cinema-light text-sm font-medium truncate">{f.pelicula}</p>
-                      <p className="text-cinema-muted text-xs">{new Date(String(f.fecha).slice(0,10)+'T00:00:00').toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'})} · {f.hora?.slice(0,5)}</p>
+                      <p className="text-cinema-muted text-xs">{f.fecha} · {f.hora?.slice(0,5)}</p>
                     </div>
                     <div className="flex items-center gap-2 w-48">
                       <div className="flex-1 bg-cinema-dark rounded-full h-2">
@@ -442,7 +438,7 @@ export default function AdminPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-cinema-light font-semibold truncate">{f.pelicula_titulo}</p>
                   <p className="text-cinema-muted text-xs">
-                    {new Date(String(f.fecha).slice(0,10) + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
+                    {new Date(f.fecha + 'T00:00:00').toLocaleDateString('es-CO', { weekday: 'short', day: 'numeric', month: 'short' })}
                     {' · '}{f.hora?.slice(0, 5)}
                     {' · '}{f.sala_nombre}
                   </p>
@@ -463,81 +459,6 @@ export default function AdminPage() {
           </div>
         </div>
       )}
-      {/* ── TAB: TIQUETES ── */}
-      {tab === 'Tiquetes' && (
-        <div className="animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-display text-2xl font-bold text-cinema-light">Tiquetes</h2>
-            <span className="text-cinema-muted text-sm">{tiquetes.length} registros</span>
-          </div>
-
-          {/* Buscador */}
-          <div className="mb-4">
-            <input
-              className="input w-full sm:w-80"
-              placeholder="Buscar por código, película o usuario..."
-              value={filtroBusq}
-              onChange={e => setFiltroBusq(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            {tiquetes
-              .filter(t => {
-                if (!filtroBusq) return true;
-                const q = filtroBusq.toLowerCase();
-                return (
-                  t.codigo?.toLowerCase().includes(q) ||
-                  t.pelicula_titulo?.toLowerCase().includes(q) ||
-                  t.usuario_nombre?.toLowerCase().includes(q) ||
-                  t.usuario_email?.toLowerCase().includes(q)
-                );
-              })
-              .map(t => (
-              <div key={t.id} className="card p-4 flex items-center gap-4">
-                {/* Info principal */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-cinema-light font-semibold truncate">{t.pelicula_titulo}</p>
-                    <span className={`text-xs font-mono px-2 py-0.5 rounded border flex-shrink-0 ${
-                      t.estado === 'activo'    ? 'bg-green-900/30 text-green-400 border-green-800' :
-                      t.estado === 'usado'     ? 'bg-yellow-900/30 text-yellow-400 border-yellow-800' :
-                      'bg-red-900/30 text-red-400 border-red-800'
-                    }`}>{t.estado}</span>
-                  </div>
-                  <p className="text-cinema-muted text-xs mt-0.5">
-                    {t.codigo} · {String(t.fecha).slice(0,10)} {t.hora?.slice(0,5)} · {t.sala_nombre}
-                  </p>
-                  <p className="text-cinema-muted text-xs">
-                    {t.usuario_nombre
-                      ? <>{t.usuario_nombre} <span className="opacity-60">({t.usuario_email})</span></>
-                      : <span className="italic">Sin cuenta</span>
-                    }
-                    {t.asientos && <> · Asientos: <span className="font-mono text-cinema-light">{t.asientos}</span></>}
-                  </p>
-                </div>
-                {/* Total */}
-                <span className="text-cinema-amber font-bold font-mono text-sm flex-shrink-0">
-                  ${parseFloat(t.total).toLocaleString('es-CO')}
-                </span>
-              </div>
-            ))}
-            {tiquetes.filter(t => {
-              if (!filtroBusq) return true;
-              const q = filtroBusq.toLowerCase();
-              return (
-                t.codigo?.toLowerCase().includes(q) ||
-                t.pelicula_titulo?.toLowerCase().includes(q) ||
-                t.usuario_nombre?.toLowerCase().includes(q) ||
-                t.usuario_email?.toLowerCase().includes(q)
-              );
-            }).length === 0 && (
-              <p className="text-cinema-muted text-sm py-4 text-center">No se encontraron tiquetes.</p>
-            )}
-          </div>
-        </div>
-      )}
-
       {tab === 'Usuarios' && (
         <div className="animate-fade-in">
           <div className="flex justify-between items-center mb-6">
