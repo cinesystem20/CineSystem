@@ -1,14 +1,15 @@
 // src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './store/AuthContext';
-import Navbar        from './components/Navbar';
-import CarteraPage   from './pages/CartelaPage';
-import PeliculaPage  from './pages/PeliculaPage';
-import AsientosPage  from './pages/AsientosPage';
-import TiquetePage   from './pages/TiquetePage';
-import ValidarPage   from './pages/ValidarPage';
-import AdminPage     from './pages/AdminPage';
-import LoginPage     from './pages/LoginPage';
+import Navbar          from './components/Navbar';
+import CarteraPage     from './pages/CartelaPage';
+import PeliculaPage    from './pages/PeliculaPage';
+import AsientosPage    from './pages/AsientosPage';
+import TiquetePage     from './pages/TiquetePage';
+import ValidarPage     from './pages/ValidarPage';
+import AdminPage       from './pages/AdminPage';
+import LoginPage       from './pages/LoginPage';
+import MisTiquetesPage from './pages/MisTiquetesPage';
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -17,18 +18,26 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="flex h-screen items-center justify-center text-cinema-amber">Cargando...</div>;
+  if (!user) return <Navigate to="/login" />;
+  return children;
+};
+
 const AppRoutes = () => (
   <div className="min-h-screen bg-cinema-black">
     <Navbar />
     <Routes>
-      <Route path="/"                    element={<CarteraPage />} />
-      <Route path="/pelicula/:id"        element={<PeliculaPage />} />
+      <Route path="/"                     element={<CarteraPage />} />
+      <Route path="/pelicula/:id"         element={<PeliculaPage />} />
       <Route path="/funcion/:id/asientos" element={<AsientosPage />} />
-      <Route path="/tiquete/:codigo"     element={<TiquetePage />} />
-      <Route path="/validar"             element={<ValidarPage />} />
-      <Route path="/login"               element={<LoginPage />} />
-      <Route path="/admin"               element={<AdminRoute><AdminPage /></AdminRoute>} />
-      <Route path="*"                    element={<Navigate to="/" />} />
+      <Route path="/tiquete/:codigo"      element={<TiquetePage />} />
+      <Route path="/validar"              element={<ValidarPage />} />
+      <Route path="/login"                element={<LoginPage />} />
+      <Route path="/mis-tiquetes"         element={<PrivateRoute><MisTiquetesPage /></PrivateRoute>} />
+      <Route path="/admin"                element={<AdminRoute><AdminPage /></AdminRoute>} />
+      <Route path="*"                     element={<Navigate to="/" />} />
     </Routes>
   </div>
 );
