@@ -43,7 +43,10 @@ export default function MisTiquetesPage() {
   if (error) return (
     <div className="max-w-md mx-auto px-4 py-20 text-center">
       <p className="text-5xl mb-4">⚠️</p>
-      <p className="text-cinema-muted">{error}</p>
+      <h2 className="font-display text-xl font-bold text-cinema-light mb-2">No se pudieron cargar tus tiquetes</h2>
+      <p className="text-cinema-muted mb-2">{error}</p>
+      <p className="text-cinema-muted text-xs mb-6">Intenta cerrar sesión y volver a ingresar.</p>
+      <Link to="/" className="btn-primary">Volver a cartelera</Link>
     </div>
   );
 
