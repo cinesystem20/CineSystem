@@ -30,15 +30,4 @@ const getByCodigo = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-const getMisTiquetes = async (req, res, next) => {
-  try {
-    const usuario_id = req.user?.id;
-    if (!usuario_id) {
-      return res.status(401).json({ error: 'Debes iniciar sesión para ver tus tiquetes' });
-    }
-    const tiquetes = await tiquetesRepo.findByUsuario(usuario_id);
-    res.json({ data: tiquetes });
-  } catch (err) { next(err); }
-};
-
-module.exports = { comprar, validar, getByCodigo, getMisTiquetes };
+module.exports = { comprar, validar, getByCodigo };
