@@ -8,15 +8,6 @@ const api = axios.create({
   timeout: 15000,
 });
 
-// Interceptor de REQUEST: adjunta el token en CADA petición desde localStorage
-api.interceptors.request.use(config => {
-  const token = localStorage.getItem('cinema_token');
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
-  return config;
-});
-
 // Interceptor de respuesta: manejo de errores global
 api.interceptors.response.use(
   res => res,
@@ -45,10 +36,10 @@ export const funcionesService = {
 };
 
 export const tiquetesService = {
-  comprar:        (data)   => api.post('/tiquetes', data),
-  validar:        (codigo) => api.post('/tiquetes/validar', { codigo }),
-  getOne:         (codigo) => api.get(`/tiquetes/${codigo}`),
-  getMisTiquetes: ()       => api.get('/tiquetes/mis-tiquetes'),
+  comprar:       (data)   => api.post('/tiquetes', data),
+  validar:       (codigo) => api.post('/tiquetes/validar', { codigo }),
+  getOne:        (codigo) => api.get(`/tiquetes/${codigo}`),
+  getMisTiquetes: ()      => api.get('/tiquetes/mis-tiquetes'),
 };
 
 export const adminService = {
