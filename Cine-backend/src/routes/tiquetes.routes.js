@@ -6,6 +6,6 @@ const { authenticate } = require('../middlewares/auth');
 router.post('/',             ctrl.comprar);                        // Público (opcional auth)
 router.post('/validar',      ctrl.validar);                        // Validación en puerta
 router.get('/mis-tiquetes',  authenticate, ctrl.getMisTiquetes);   // Debe ir ANTES de /:codigo
-router.get('/:codigo',       authenticate, ctrl.getByCodigo);
+router.get('/:codigo',       ctrl.getByCodigo);  // Público: cualquiera con el código puede ver su tiquete
 
 module.exports = router;
