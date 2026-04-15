@@ -3,7 +3,6 @@ const db     = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
 
 const findByCodigo = async (codigo) => {
-  // MySQL no tiene json_agg; obtenemos el tiquete y los asientos por separado
   const { rows: tiquetes } = await db.query(
     `SELECT t.*,
             f.fecha, f.hora, f.precio AS precio_funcion,
@@ -20,7 +19,6 @@ const findByCodigo = async (codigo) => {
 
   const tiquete = tiquetes[0];
 
-  // Traer asientos asociados
   const { rows: asientos } = await db.query(
     `SELECT a.fila, a.columna, a.numero
      FROM detalle_tiquete dt
@@ -78,7 +76,6 @@ const findByUsuario = async (usuario_id) => {
     [usuario_id]
   );
 
-  // Para cada tiquete, traer sus asientos
   for (const tiquete of tiquetes) {
     const { rows: asientos } = await db.query(
       `SELECT a.fila, a.columna, a.numero
