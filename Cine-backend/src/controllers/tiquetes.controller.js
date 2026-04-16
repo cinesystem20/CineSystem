@@ -5,7 +5,7 @@ const tiquetesRepo    = require('../repositories/tiquetes.repository');
 const comprar = async (req, res, next) => {
   try {
     const { funcion_id, asiento_ids } = req.body;
-    const usuario_id = req.user?.id || null;
+    const usuario_id = req.user?.id ?? null;
     const resultado  = await tiquetesService.comprar({ funcion_id, asiento_ids, usuario_id });
     res.status(201).json({ data: resultado, message: '¡Compra exitosa!' });
   } catch (err) { next(err); }
@@ -30,4 +30,12 @@ const getByCodigo = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { comprar, validar, getByCodigo };
+const getMisTiquetes = async (req, res, next) => {
+  try {
+    const usuario_id = req.user.id;
+    const tiquetes = await tiquetesRepo.findByUsuario(usuario_id);
+    res.json({ data: tiquetes });
+  } catch (err) { next(err); }
+};
+
+module.exports = { comprar, validar, getByCodigo, getMisTiquetes };
