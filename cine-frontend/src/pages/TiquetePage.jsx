@@ -31,9 +31,9 @@ export default function TiquetePage() {
   if (error || !tiquete) return (
     <div className="max-w-md mx-auto px-4 py-20 text-center">
       <p className="text-5xl mb-4">🎟️</p>
-      <h2 className="font-display text-2xl font-bold text-cinema-light mb-2">Tiquete no encontrado</h2>
+      <h2 className="font-display text-2xl font-bold text-cinema-light mb-2">Necesario iniciar sesion</h2>
       <p className="text-cinema-muted mb-6">{error || 'El código ingresado no es válido.'}</p>
-      <Link to="/" className="btn-primary">Iniciar Sesion</Link>
+      <Link to="/" className="btn-primary">Volver a cartelera</Link>
     </div>
   );
 
