@@ -33,7 +33,7 @@ export default function TiquetePage() {
       <p className="text-5xl mb-4">🎟️</p>
       <h2 className="font-display text-2xl font-bold text-cinema-light mb-2">Tiquete no encontrado</h2>
       <p className="text-cinema-muted mb-6">{error || 'El código ingresado no es válido.'}</p>
-      <Link to="/" className="btn-primary">Volver a cartelera</Link>
+      <Link to="/" className="btn-primary">Iniciar Sesion</Link>
     </div>
   );
 
